@@ -77,6 +77,21 @@ docker compose exec postgres psql -U qualitara -d qualitara -c \
 
 ---
 
+## Run tests
+
+A small integration test suite covers the four highest-value invariants: concurrent zone increments, repeated-fault idempotency, out-of-order telemetry guard, and `/anomalies` filtering. Tests run in-process via httpx + ASGI against the same Postgres the backend uses, so the docker-compose stack must be up.
+
+```bash
+docker compose up -d --build         # if not already running
+docker compose exec backend pytest   # runs backend/tests/* inside the container
+```
+
+The test fixture truncates `telemetry`, `anomalies`, `missions`, and `maintenance_records` and re-zeroes `zone_counts` before each test, so running the suite **wipes local demo state**. Use the reset recipe at the bottom of this file if you want a clean canvas afterwards.
+
+Test dependencies (`pytest`, `pytest-asyncio`, `httpx`) live in `backend/requirements-dev.txt` and are installed in the backend image. To run from the host instead of the container you need Python 3.12 and a venv with the dev requirements installed.
+
+---
+
 ## Verification checklist
 
 These were exercised during development. Each one is reproducible from the CLI above or the dashboard buttons.
@@ -134,9 +149,16 @@ backend/
     ws.py             # broadcast manager
     routes/           # one module per resource
     services/         # transactional service layer (telemetry, vehicles, missions, anomalies, simulator)
-  migrations/0001_init.sql
+  migrations/
+    0001_init.sql
+    0002_event_id_and_ingested_at.sql
+  tests/
+    conftest.py
+    test_invariants.py
   Dockerfile
+  pytest.ini
   requirements.txt
+  requirements-dev.txt
 frontend/
   src/
     App.tsx

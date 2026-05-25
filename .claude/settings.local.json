@@ -4,7 +4,11 @@
       "WebFetch(domain:qualitara.notion.site)",
       "Bash(npx tsc *)",
       "Bash(python -c ' *)",
-      "Bash(python3 -c ' *)"
+      "Bash(python3 -c ' *)",
+      "Bash(python3 -m pip install --user --quiet pytest pytest-asyncio httpx fastapi asyncpg pydantic uvicorn)",
+      "Bash(python3 -m venv .testvenv)",
+      "Bash(.testvenv/bin/pip install *)",
+      "Bash(ls /opt/homebrew/opt/python@3.12/bin/python* /usr/local/opt/python@3.12/bin/python* /opt/homebrew/bin/python3.1[0-3] /usr/bin/python3 2>/dev/null; python3 --version)"
     ]
   }
 }
